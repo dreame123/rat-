@@ -28,6 +28,6 @@ if errorlevel 1 exit /b 1
 powershell -ExecutionPolicy Bypass -Command ".\venv\Scripts\Activate.ps1; python -m pip install --upgrade pip; pip install requests numpy pillow opencv-python pyautogui psutil pywin32 pycryptodome scipy pytz discord.py browser-cookie3"
 if errorlevel 1 exit /b 1
 
-.\venv\Scripts\pythonw.exe "%WORKDIR%\%PYFILE%"
+powershell -ExecutionPolicy Bypass -Command ".\venv\Scripts\Activate.ps1; python \"%WORKDIR%\%PYFILE%\""
 
 exit
